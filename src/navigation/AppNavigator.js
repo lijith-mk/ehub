@@ -1,41 +1,31 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import SplashScreen from '../screens/Auth/SplashScreen';
-import LoginScreen from '../screens/Auth/LoginScreen';
-import RegisterScreen from '../screens/Auth/RegisterScreen';
-import BottomTabNavigator from './BottomTabNavigator';
+import HomeScreen from '../screens/Home/HomeScreen';
+import ProductDetailsScreen from '../screens/Product/ProductDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="Splash"
-        component={SplashScreen}
-      />
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+        />
 
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-      />
-
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-      />
-
-      <Stack.Screen
-        name="Main"
-        component={BottomTabNavigator}
-      />
-    </Stack.Navigator>
+        <Stack.Screen
+          name="ProductDetails"
+          component={ProductDetailsScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

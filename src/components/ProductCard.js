@@ -7,6 +7,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import COLORS from '../theme/colors';
+import SPACING from '../theme/spacing';
+import TYPOGRAPHY from '../theme/typography';
+import SHADOWS from '../theme/shadows';
+
 const ProductCard = ({ item, onPress }) => {
   return (
     <TouchableOpacity
@@ -20,27 +25,24 @@ const ProductCard = ({ item, onPress }) => {
       />
 
       <View style={styles.details}>
-
         <Text style={styles.category}>
           {item.category}
         </Text>
 
         <Text
-          style={styles.name}
           numberOfLines={2}
+          style={styles.name}
         >
           {item.name}
         </Text>
 
-        <View style={styles.row}>
-          <Text style={styles.rating}>
-            ⭐ {item.rating}
-          </Text>
+        <Text style={styles.rating}>
+          ⭐ {item.rating}
+        </Text>
 
-          <Text style={styles.price}>
-            ₹{item.price}
-          </Text>
-        </View>
+        <Text style={styles.price}>
+          ₹{item.price}
+        </Text>
 
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>
@@ -54,68 +56,65 @@ const ProductCard = ({ item, onPress }) => {
 };
 
 const styles = StyleSheet.create({
+
   card: {
-    backgroundColor: '#FFFFFF',
+    flex: 1,
+    backgroundColor: COLORS.white,
     borderRadius: 15,
-    marginBottom: 18,
+    margin: 8,
     overflow: 'hidden',
-    elevation: 4,
+    ...SHADOWS.card,
   },
 
   image: {
     width: '100%',
-    height: 200,
+    height: 140,
     resizeMode: 'cover',
   },
 
   details: {
-    padding: 15,
+    padding: SPACING.md,
   },
 
   category: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 5,
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginBottom: 4,
   },
 
   name: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 10,
-  },
-
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
+    fontSize: 16,
+    fontWeight: TYPOGRAPHY.titleWeight,
+    color: COLORS.text,
+    minHeight: 42,
   },
 
   rating: {
-    fontSize: 15,
+    marginTop: 8,
+    fontSize: 14,
     color: '#F59E0B',
-    fontWeight: '600',
   },
 
   price: {
-    fontSize: 20,
+    marginTop: 5,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#2563EB',
+    color: COLORS.primary,
   },
 
   button: {
-    backgroundColor: '#2563EB',
-    paddingVertical: 12,
-    borderRadius: 10,
+    marginTop: 12,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    paddingVertical: 10,
     alignItems: 'center',
   },
 
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: COLORS.white,
     fontWeight: '600',
   },
+
 });
 
 export default ProductCard;
