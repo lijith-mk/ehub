@@ -18,8 +18,8 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    console.log('Login Clicked');
-  };
+  navigation.replace('Main');
+};
 
   return (
     <SafeAreaView style={styles.container}>
