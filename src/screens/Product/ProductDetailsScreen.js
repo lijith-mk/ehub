@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { CartContext } from '../../context/CartContext';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   ScrollView,
+  Alert,
+  Pressable,
 } from 'react-native';
 
 const ProductDetailsScreen = ({ route }) => {
   const { product } = route.params;
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useContext(CartContext);
 
   return (
     <ScrollView style={styles.container}>
@@ -67,11 +71,17 @@ const ProductDetailsScreen = ({ route }) => {
         </View>
 
         {/* Add to Cart Button */}
-        <View style={styles.cartButton}>
-          <Text style={styles.cartButtonText}>
-            🛒 Add to Cart
-          </Text>
-        </View>
+        <Pressable
+  style={styles.cartButton}
+  onPress={() => {
+    addToCart(product, quantity);
+    Alert.alert('Success', 'Product added to cart');
+  }}
+>
+  <Text style={styles.cartButtonText}>
+    🛒 Add to Cart
+  </Text>
+</Pressable>
 
       </View>
     </ScrollView>

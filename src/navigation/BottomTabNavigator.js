@@ -1,7 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons';
-
+import Ionicons from '@react-native-vector-icons/ionicons';
 import HomeScreen from '../screens/Home/HomeScreen';
 import CartScreen from '../screens/Cart/CartScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
@@ -35,11 +34,11 @@ const BottomTabNavigator = () => {
           }
 
           return (
-            <Icon
-              name={iconName}
-              size={size}
-              color={color}
-            />
+            <Ionicons
+  name={iconName}
+  size={size}
+  color={color}
+/>
           );
         },
       })}
