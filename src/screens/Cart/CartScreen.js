@@ -11,7 +11,12 @@ import {
 import { CartContext } from '../../context/CartContext';
 
 const CartScreen = () => {
-  const { cartItems, removeFromCart } = useContext(CartContext);
+  const {
+    cartItems,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useContext(CartContext);
 
   const total = cartItems.reduce((sum, item) => {
     return sum + item.price * item.quantity;
@@ -27,13 +32,30 @@ const CartScreen = () => {
       <View style={styles.details}>
         <Text style={styles.name}>{item.name}</Text>
 
-        <Text>Quantity: {item.quantity}</Text>
+        <View style={styles.quantityContainer}>
+          <Pressable
+            style={styles.qtyButton}
+            onPress={() => decreaseQuantity(item.id)}
+          >
+            <Text style={styles.qtyButtonText}>-</Text>
+          </Pressable>
+
+          <Text style={styles.qtyText}>
+            {item.quantity}
+          </Text>
+
+          <Pressable
+            style={styles.qtyButton}
+            onPress={() => increaseQuantity(item.id)}
+          >
+            <Text style={styles.qtyButtonText}>+</Text>
+          </Pressable>
+        </View>
 
         <Text style={styles.price}>
           ₹ {item.price}
         </Text>
 
-        {/* Remove Button */}
         <Pressable
           style={styles.removeButton}
           onPress={() => removeFromCart(item.id)}
@@ -77,10 +99,10 @@ const styles = StyleSheet.create({
 
   card: {
     flexDirection: 'row',
-    marginBottom: 15,
     backgroundColor: '#f5f5f5',
     padding: 10,
     borderRadius: 10,
+    marginBottom: 15,
   },
 
   image: {
@@ -90,9 +112,9 @@ const styles = StyleSheet.create({
   },
 
   details: {
+    flex: 1,
     marginLeft: 15,
     justifyContent: 'center',
-    flex: 1,
   },
 
   name: {
@@ -100,10 +122,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  price: {
-    color: '#0A84FF',
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  qtyButton: {
+    width: 35,
+    height: 35,
+    backgroundColor: '#2563EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+
+  qtyButtonText: {
+    color: '#fff',
+    fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 5,
+  },
+
+  qtyText: {
+    marginHorizontal: 15,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  price: {
+    marginTop: 10,
+    color: '#2563EB',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   removeButton: {
