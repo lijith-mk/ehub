@@ -10,7 +10,7 @@ import {
 
 import { CartContext } from '../../context/CartContext';
 
-const CartScreen = () => {
+const CartScreen = ({ navigation }) => {
   const {
     cartItems,
     removeFromCart,
@@ -85,6 +85,15 @@ const CartScreen = () => {
         <Text style={styles.total}>
           Total: ₹ {total}
         </Text>
+
+        <Pressable
+          style={styles.checkoutButton}
+          onPress={() => navigation.navigate('Checkout')}
+        >
+          <Text style={styles.checkoutText}>
+            Proceed to Checkout
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -184,6 +193,20 @@ const styles = StyleSheet.create({
 
   total: {
     fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+
+  checkoutButton: {
+    backgroundColor: '#16A34A',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  checkoutText: {
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
