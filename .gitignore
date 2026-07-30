@@ -73,3 +73,55 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+
+# Metro
+.metro-health-check*
+
+# React Native
+.expo/
+android/.gradle/
+android/app/build/
+android/build/
+ios/build/
+ios/Pods/
+
+# Local environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Android
+*.keystore
+*.jks
+local.properties
+
+# Xcode
+xcuserdata/
+*.xcworkspace
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage
+coverage/
+
+# Misc
+*.swp
