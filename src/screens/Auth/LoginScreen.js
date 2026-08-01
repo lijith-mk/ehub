@@ -8,7 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import api from '../../api/api';
 
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -16,10 +21,45 @@ import CustomButton from '../../components/CustomButton';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-  navigation.replace('Main');
-};
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      await AsyncStorage.setItem(
+        'token',
+        response.data.token,
+      );
+
+      await AsyncStorage.setItem(
+        'user',
+        JSON.stringify(response.data.user),
+      );
+
+      Alert.alert('Success', response.data.message);
+
+      navigation.replace('Main');
+
+    } catch (error) {
+      Alert.alert(
+        'Login Failed',
+        error.response?.data?.message || 'Something went wrong'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,7 +71,9 @@ const LoginScreen = ({ navigation }) => {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Welcome Back 👋</Text>
+          <Text style={styles.title}>
+            Welcome Back 👋
+          </Text>
 
           <Text style={styles.subtitle}>
             Sign in to continue shopping
@@ -57,7 +99,7 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <CustomButton
-            title="Login"
+            title={loading ? 'Logging In...' : 'Login'}
             onPress={handleLogin}
           />
 

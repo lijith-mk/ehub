@@ -35,7 +35,7 @@ const CartScreen = ({ navigation }) => {
         <View style={styles.quantityContainer}>
           <Pressable
             style={styles.qtyButton}
-            onPress={() => decreaseQuantity(item.id)}
+            onPress={() => decreaseQuantity(item._id)}
           >
             <Text style={styles.qtyButtonText}>-</Text>
           </Pressable>
@@ -46,7 +46,7 @@ const CartScreen = ({ navigation }) => {
 
           <Pressable
             style={styles.qtyButton}
-            onPress={() => increaseQuantity(item.id)}
+            onPress={() => increaseQuantity(item._id)}
           >
             <Text style={styles.qtyButtonText}>+</Text>
           </Pressable>
@@ -58,7 +58,7 @@ const CartScreen = ({ navigation }) => {
 
         <Pressable
           style={styles.removeButton}
-          onPress={() => removeFromCart(item.id)}
+          onPress={() => removeFromCart(item._id)}
         >
           <Text style={styles.removeText}>
             Remove
@@ -72,7 +72,7 @@ const CartScreen = ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={cartItems}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ListEmptyComponent={
           <Text style={styles.empty}>
@@ -88,7 +88,11 @@ const CartScreen = ({ navigation }) => {
 
         <Pressable
           style={styles.checkoutButton}
-          onPress={() => navigation.navigate('Checkout')}
+          onPress={() =>
+            navigation.navigate('Checkout', {
+              total,
+            })
+          }
         >
           <Text style={styles.checkoutText}>
             Proceed to Checkout

@@ -8,10 +8,16 @@ import {
   Alert,
 } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import api from '../../api/api';
+
 import { CartContext } from '../../context/CartContext';
 
-const CheckoutScreen = ({ navigation }) => {
-  const { cartItems } = useContext(CartContext);
+const CheckoutScreen = ({ navigation, route }) => {
+  const { clearCart } = useContext(CartContext);
+
+  const { total } = route.params || { total: 0 };
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -19,26 +25,38 @@ const CheckoutScreen = ({ navigation }) => {
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
 
-  const total = cartItems.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
-  }, 0);
-
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (!name || !phone || !address || !city || !pincode) {
       Alert.alert('Error', 'Please fill all the details');
       return;
     }
 
-    Alert.alert(
-      'Order Placed',
-      'Your order has been placed successfully!',
-      [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('Main'),
-        },
-      ],
-    );
+    try {
+      const user = JSON.parse(
+        await AsyncStorage.getItem('user')
+      );
+
+      await api.post('/orders', {
+        userId: user._id,
+      });
+
+      clearCart();
+
+      Alert.alert(
+        'Success',
+        'Order Placed Successfully'
+      );
+
+      navigation.replace('OrderSuccess');
+
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+
+      Alert.alert(
+        'Error',
+        'Unable to place order'
+      );
+    }
   };
 
   return (
