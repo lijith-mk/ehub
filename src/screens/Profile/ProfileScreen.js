@@ -88,7 +88,7 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.menuCard}>
             <MenuItem icon="bag-outline" label="My Orders" subtitle="Track & manage orders" onPress={() => navigation.navigate('MyOrders')} />
             <MenuItem icon="heart-outline" label="Wishlist" subtitle="Saved items" onPress={() => navigation.navigate('Wishlist')} />
-            <MenuItem icon="location-outline" label="Addresses" subtitle="Delivery addresses" />
+            <MenuItem icon="location-outline" label="Addresses" subtitle="Delivery addresses" onPress={() => navigation.navigate('AddressBook')} />
             <MenuItem icon="card-outline" label="Payment Methods" subtitle="Saved cards & UPI" />
           </View>
         </View>

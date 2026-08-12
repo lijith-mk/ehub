@@ -9,6 +9,7 @@ import api from '../../api/api';
 import { CartContext } from '../../context/CartContext';
 import CustomInput from '../../components/CustomInput';
 import COLORS from '../../theme/colors';
+import { loadAddresses } from '../Address/AddressBookScreen';
 
 const CheckoutScreen = ({ navigation, route }) => {
   const { cartItems, clearCart } = useContext(CartContext);
@@ -23,6 +24,20 @@ const CheckoutScreen = ({ navigation, route }) => {
 
   // Coupon state
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+
+  // Load default address on mount
+  React.useEffect(() => {
+    loadAddresses().then((list) => {
+      const def = list.find((a) => a.isDefault) || list[0];
+      if (def) {
+        setName(def.name);
+        setPhone(def.phone);
+        setAddress(def.address);
+        setCity(def.city);
+        setPincode(def.pincode);
+      }
+    });
+  }, []);
 
   const deliveryFee = total >= 499 ? 0 : 49;
   const discount = appliedCoupon ? appliedCoupon.discount : 0;
@@ -96,6 +111,22 @@ const CheckoutScreen = ({ navigation, route }) => {
             <View style={styles.sectionHeader}>
               <Ionicons name="location-outline" size={20} color={COLORS.primary} />
               <Text style={styles.sectionTitle}>Delivery Address</Text>
+              <TouchableOpacity
+                style={styles.savedBtn}
+                onPress={() => navigation.navigate('AddressBook', {
+                  selectMode: true,
+                  onSelect: (addr) => {
+                    setName(addr.name);
+                    setPhone(addr.phone);
+                    setAddress(addr.address);
+                    setCity(addr.city);
+                    setPincode(addr.pincode);
+                  },
+                })}
+              >
+                <Ionicons name="bookmark-outline" size={13} color={COLORS.primary} />
+                <Text style={styles.savedBtnText}>Saved</Text>
+              </TouchableOpacity>
             </View>
             <CustomInput placeholder="Full Name" value={name} onChangeText={setName} icon="person-outline" />
             <CustomInput placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" icon="call-outline" />
@@ -238,7 +269,13 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10, marginTop: 4,
   },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, flex: 1 },
+  savedBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 10, paddingVertical: 5,
+    backgroundColor: COLORS.primaryLight, borderRadius: 10,
+  },
+  savedBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
 
   // Coupon button
   couponBtn: {

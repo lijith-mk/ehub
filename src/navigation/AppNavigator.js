@@ -20,6 +20,8 @@ import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
 import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import SearchScreen from '../screens/Search/SearchScreen';
 import CouponScreen from '../screens/Coupon/CouponScreen';
+import AddressBookScreen from '../screens/Address/AddressBookScreen';
+import AddAddressScreen from '../screens/Address/AddAddressScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,8 @@ const AppNavigator = () => {
         <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="Coupon" component={CouponScreen} />
+        <Stack.Screen name="AddressBook" component={AddressBookScreen} />
+        <Stack.Screen name="AddAddress" component={AddAddressScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
