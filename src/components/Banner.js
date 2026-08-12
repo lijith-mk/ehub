@@ -42,7 +42,7 @@ const banners = [
   },
 ];
 
-const Banner = () => {
+const Banner = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatRef = useRef(null);
 
@@ -64,15 +64,21 @@ const Banner = () => {
   }).current;
 
   const renderBanner = ({ item }) => (
-    <View style={[styles.banner, { backgroundColor: item.bg[0] }]}>
+    <TouchableOpacity
+      style={[styles.banner, { backgroundColor: item.bg[0] }]}
+      activeOpacity={0.92}
+      onPress={() => item.id === '1' && navigation?.navigate('FlashSale')}
+    >
       <View style={styles.bannerDecor} />
       <Text style={styles.bannerTag}>{item.tag}</Text>
       <Text style={styles.bannerTitle}>{item.title}</Text>
       <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
-      <TouchableOpacity style={[styles.bannerBtn, { backgroundColor: item.btnColor }]}>
-        <Text style={[styles.bannerBtnText, { color: item.btnText }]}>Shop Now →</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={[styles.bannerBtn, { backgroundColor: item.btnColor }]}>
+        <Text style={[styles.bannerBtnText, { color: item.btnText }]}>
+          {item.id === '1' ? 'View Deals →' : 'Shop Now →'}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (

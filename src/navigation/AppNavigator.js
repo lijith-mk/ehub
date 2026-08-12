@@ -22,6 +22,7 @@ import SearchScreen from '../screens/Search/SearchScreen';
 import CouponScreen from '../screens/Coupon/CouponScreen';
 import AddressBookScreen from '../screens/Address/AddressBookScreen';
 import AddAddressScreen from '../screens/Address/AddAddressScreen';
+import FlashSaleScreen from '../screens/Deals/FlashSaleScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Coupon" component={CouponScreen} />
         <Stack.Screen name="AddressBook" component={AddressBookScreen} />
         <Stack.Screen name="AddAddress" component={AddAddressScreen} />
+        <Stack.Screen name="FlashSale" component={FlashSaleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
