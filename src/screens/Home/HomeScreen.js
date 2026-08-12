@@ -131,7 +131,7 @@ const HomeScreen = ({ navigation }) => {
         ListHeaderComponent={
           <>
             <HomeHeader navigation={navigation} />
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onPress={() => navigation.navigate('Search')} />
             <Banner />
             <CategoryList onSelect={handleCategorySelect} />
             <View style={styles.sectionHeader}>

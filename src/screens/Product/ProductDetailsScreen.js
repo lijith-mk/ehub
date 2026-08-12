@@ -47,7 +47,7 @@ const RatingBar = ({ label, value, total }) => {
       <View style={rStyle.track}>
         <View style={[rStyle.fill, { width: `${pct}%`, backgroundColor: color }]} />
       </View>
-      <Text style={rStyle.count}>{value}</Text>
+      <Text style={rStyle.count}>{String(value)}</Text>
     </View>
   );
 };

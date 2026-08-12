@@ -9,7 +9,7 @@ const ProductCard = ({ item, onPress, onAddToCart }) => {
       {/* Image */}
       <View style={styles.imageWrap}>
         <Image source={{ uri: item.image }} style={styles.image} />
-        {item.discount && (
+        {!!item.discount && item.discount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{item.discount}%</Text>
           </View>

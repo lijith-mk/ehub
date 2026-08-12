@@ -15,7 +15,7 @@ const CartBadge = ({ count }) => {
   if (!count) return null;
   return (
     <View style={styles.badge}>
-      <Text style={styles.badgeText}>{count > 99 ? '99+' : count}</Text>
+      <Text style={styles.badgeText}>{count > 99 ? '99+' : String(count)}</Text>
     </View>
   );
 };
