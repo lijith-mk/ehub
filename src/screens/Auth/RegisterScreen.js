@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
   TouchableOpacity,
+  Animated,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import api from '../../api/api';
-
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import COLORS from '../../theme/colors';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -22,106 +22,82 @@ const RegisterScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
-
   const [loading, setLoading] = useState(false);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Please fill all required fields');
+      Alert.alert('Missing Fields', 'Please fill all required fields');
       return;
     }
-
     try {
       setLoading(true);
-
-      const response = await api.post('/auth/register', {
-        name,
-        email,
-        password,
-        phone,
-        address,
-      });
-
-      Alert.alert('Success', response.data.message);
-
+      const response = await api.post('/auth/register', { name, email, password, phone, address });
+      Alert.alert('Account Created', response.data.message);
       navigation.goBack();
-
     } catch (error) {
-      Alert.alert(
-        'Registration Failed',
-        error.response?.data?.message || 'Something went wrong'
-      );
+      Alert.alert('Registration Failed', error.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+
+      <ScrollView
+          contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
         >
-          <Text style={styles.title}>Create Account</Text>
+          <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
 
-          <Text style={styles.subtitle}>
-            Register to start shopping
-          </Text>
-
-          <CustomInput
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
-          />
-
-          <CustomInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <CustomInput
-            placeholder="Phone"
-            value={phone}
-            onChangeText={setPhone}
-          />
-
-          <CustomInput
-            placeholder="Address"
-            value={address}
-            onChangeText={setAddress}
-          />
-
-          <CustomInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-
-          <CustomButton
-            title={loading ? 'Creating Account...' : 'Register'}
-            onPress={handleRegister}
-          />
-
-          <View style={styles.footer}>
-            <Text>Already have an account?</Text>
-
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.login}>
-                Login
-              </Text>
+            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+              <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
-          </View>
 
+            <View style={styles.header}>
+              <View style={styles.logoMark}>
+                <Text style={styles.logoLetter}>E</Text>
+              </View>
+              <Text style={styles.title}>Create Account</Text>
+              <Text style={styles.subtitle}>Join Ehub and start shopping</Text>
+            </View>
+
+            <View style={styles.form}>
+              <CustomInput placeholder="Full Name" value={name} onChangeText={setName} icon="person-outline" />
+              <CustomInput placeholder="Email Address" value={email} onChangeText={setEmail} keyboardType="email-address" icon="mail-outline" />
+              <CustomInput placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" icon="call-outline" />
+              <CustomInput placeholder="Delivery Address" value={address} onChangeText={setAddress} icon="location-outline" />
+              <CustomInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry icon="lock-closed-outline" />
+
+              <CustomButton
+                title={loading ? 'Creating Account...' : 'Create Account'}
+                onPress={handleRegister}
+                disabled={loading}
+              />
+
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Already have an account? </Text>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Text style={styles.linkText}>Sign In</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+          </Animated.View>
         </ScrollView>
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -129,38 +105,86 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: COLORS.background,
   },
-
-  scrollContainer: {
+  scroll: {
     flexGrow: 1,
+    paddingHorizontal: 28,
+    paddingVertical: 24,
+  },
+  content: {
+    flex: 1,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
-
+  backArrow: {
+    fontSize: 22,
+    color: COLORS.text,
+    lineHeight: 26,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logoMark: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
+  },
+  logoLetter: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#fff',
+  },
   title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontSize: 28,
+    fontWeight: '800',
+    color: COLORS.text,
+    letterSpacing: -0.5,
   },
-
   subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginBottom: 30,
-    marginTop: 8,
+    fontSize: 15,
+    color: COLORS.textLight,
+    marginTop: 6,
   },
-
+  form: {
+    width: '100%',
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 25,
+    marginTop: 24,
+    marginBottom: 10,
   },
-
-  login: {
-    marginLeft: 5,
-    color: '#2563EB',
-    fontWeight: 'bold',
+  footerText: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+  },
+  linkText: {
+    color: COLORS.primary,
+    fontWeight: '700',
+    fontSize: 15,
   },
 });
 

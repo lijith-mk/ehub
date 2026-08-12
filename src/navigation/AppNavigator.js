@@ -1,62 +1,46 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { navigationRef } from './navigationRef';
 
+import SplashScreen from '../screens/Auth/SplashScreen';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 
 import BottomTabNavigator from './BottomTabNavigator';
 
 import ProductDetailsScreen from '../screens/Product/ProductDetailsScreen';
-
 import CheckoutScreen from '../screens/Cart/CheckoutScreen';
 import OrderSuccessScreen from '../screens/Cart/OrderSuccessScreen';
+import MyOrdersScreen from '../screens/Orders/MyOrdersScreen';
+import OrderDetailScreen from '../screens/Orders/OrderDetailScreen';
+import WishlistScreen from '../screens/Wishlist/WishlistScreen';
+import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{
-          headerShown: false,
-        }}
+        initialRouteName="Splash"
+        screenOptions={{ headerShown: false }}
       >
-        {/* Authentication */}
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-        />
-
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-        />
-
-        {/* Main App */}
-        <Stack.Screen
-          name="Main"
-          component={BottomTabNavigator}
-        />
-
-        {/* Product */}
-        <Stack.Screen
-          name="ProductDetails"
-          component={ProductDetailsScreen}
-        />
-
-        {/* Cart */}
-        <Stack.Screen
-          name="Checkout"
-          component={CheckoutScreen}
-        />
-
-        <Stack.Screen
-          name="OrderSuccess"
-          component={OrderSuccessScreen}
-        />
-
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Main" component={BottomTabNavigator} />
+        <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
+        <Stack.Screen name="MyOrders" component={MyOrdersScreen} />
+        <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+        <Stack.Screen name="Wishlist" component={WishlistScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

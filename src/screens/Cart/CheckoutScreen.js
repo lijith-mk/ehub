@@ -2,21 +2,23 @@ import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
-  Pressable,
+  ScrollView,
+  TouchableOpacity,
   Alert,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@react-native-vector-icons/ionicons';
 import api from '../../api/api';
-
 import { CartContext } from '../../context/CartContext';
+import CustomInput from '../../components/CustomInput';
+import COLORS from '../../theme/colors';
 
 const CheckoutScreen = ({ navigation, route }) => {
-  const { clearCart } = useContext(CartContext);
-
+  const { cartItems, clearCart } = useContext(CartContext);
   const { total } = route.params || { total: 0 };
 
   const [name, setName] = useState('');
@@ -24,149 +26,284 @@ const CheckoutScreen = ({ navigation, route }) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const placeOrder = async () => {
     if (!name || !phone || !address || !city || !pincode) {
-      Alert.alert('Error', 'Please fill all the details');
+      Alert.alert('Missing Fields', 'Please fill all delivery details');
       return;
     }
-
     try {
-      const user = JSON.parse(
-        await AsyncStorage.getItem('user')
-      );
+      setLoading(true);
+
+      const products = cartItems.map((item) => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image,
+      }));
+
+      const deliveryFee = total >= 499 ? 0 : 49;
 
       await api.post('/orders', {
-        userId: user._id,
+        products,
+        totalPrice: total + deliveryFee,
+        deliveryAddress: { name, phone, address, city, pincode },
       });
 
       clearCart();
-
-      Alert.alert(
-        'Success',
-        'Order Placed Successfully'
-      );
-
       navigation.replace('OrderSuccess');
-
     } catch (error) {
-      console.log(error.response?.data || error.message);
-
       Alert.alert(
-        'Error',
-        'Unable to place order'
+        'Order Failed',
+        error.response?.data?.message || 'Unable to place order. Please try again.'
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Checkout</Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar backgroundColor={COLORS.background} barStyle="dark-content" />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
 
-      <TextInput
-        placeholder="Full Name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
+        <View style={styles.topBar}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={20} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.topBarTitle}>Checkout</Text>
+          <View style={{ width: 44 }} />
+        </View>
 
-      <TextInput
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-        style={styles.input}
-      />
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
-      <TextInput
-        placeholder="Address"
-        value={address}
-        onChangeText={setAddress}
-        multiline
-        style={[styles.input, styles.addressInput]}
-      />
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="location-outline" size={20} color={COLORS.primary} />
+              <Text style={styles.sectionTitle}>Delivery Address</Text>
+            </View>
+            <CustomInput placeholder="Full Name" value={name} onChangeText={setName} icon="person-outline" />
+            <CustomInput placeholder="Phone Number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" icon="call-outline" />
+            <CustomInput placeholder="Street Address" value={address} onChangeText={setAddress} icon="home-outline" />
+            <CustomInput placeholder="City" value={city} onChangeText={setCity} icon="business-outline" />
+            <CustomInput placeholder="Pincode" value={pincode} onChangeText={setPincode} keyboardType="number-pad" icon="map-outline" />
+          </View>
 
-      <TextInput
-        placeholder="City"
-        value={city}
-        onChangeText={setCity}
-        style={styles.input}
-      />
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="receipt-outline" size={20} color={COLORS.primary} />
+              <Text style={styles.sectionTitle}>Order Summary</Text>
+            </View>
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Subtotal</Text>
+                <Text style={styles.summaryValue}>₹{total.toLocaleString()}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Delivery</Text>
+                <Text style={[styles.summaryValue, { color: COLORS.success }]}>
+                  {total >= 499 ? 'FREE' : '₹49'}
+                </Text>
+              </View>
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryRow}>
+                <Text style={styles.totalLabel}>Total Payable</Text>
+                <Text style={styles.totalValue}>
+                  ₹{(total >= 499 ? total : total + 49).toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          </View>
 
-      <TextInput
-        placeholder="Pincode"
-        value={pincode}
-        onChangeText={setPincode}
-        keyboardType="number-pad"
-        style={styles.input}
-      />
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="card-outline" size={20} color={COLORS.primary} />
+              <Text style={styles.sectionTitle}>Payment Method</Text>
+            </View>
+            <TouchableOpacity style={styles.payOption}>
+              <View style={styles.payLeft}>
+                <Ionicons name="cash-outline" size={22} color={COLORS.primary} />
+                <Text style={styles.payLabel}>Cash on Delivery</Text>
+              </View>
+              <View style={styles.radioActive}>
+                <View style={styles.radioDot} />
+              </View>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.totalBox}>
-        <Text style={styles.totalText}>
-          Total Amount: ₹ {total}
-        </Text>
-      </View>
+        </ScrollView>
 
-      <Pressable
-        style={styles.button}
-        onPress={placeOrder}
-      >
-        <Text style={styles.buttonText}>
-          Place Order
-        </Text>
-      </Pressable>
-    </View>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.placeBtn, loading && styles.placeBtnDisabled]}
+            onPress={placeOrder}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.placeBtnText}>{loading ? 'Placing Order...' : 'Place Order'}</Text>
+            {!loading && <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />}
+          </TouchableOpacity>
+        </View>
+
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: COLORS.background,
   },
-
-  heading: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  topBarTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: COLORS.text,
+  },
+  scroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  section: {
     marginBottom: 20,
   },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+    marginTop: 4,
   },
-
-  addressInput: {
-    height: 100,
-    textAlignVertical: 'top',
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
   },
-
-  totalBox: {
-    marginTop: 10,
-    marginBottom: 25,
+  summaryCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
-
-  totalText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#2563EB',
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
-
-  button: {
-    backgroundColor: '#16A34A',
-    padding: 15,
-    borderRadius: 8,
+  summaryLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 8,
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: COLORS.text,
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: COLORS.primary,
+  },
+  payOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  payLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  payLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  radioActive: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-
-  buttonText: {
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.primary,
+  },
+  footer: {
+    padding: 20,
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  placeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    paddingVertical: 17,
+    gap: 10,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
+  },
+  placeBtnDisabled: {
+    opacity: 0.65,
+  },
+  placeBtnText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
 

@@ -1,43 +1,42 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-
 import categories from '../data/categories';
-
 import COLORS from '../theme/colors';
-import SPACING from '../theme/spacing';
-import TYPOGRAPHY from '../theme/typography';
-import SHADOWS from '../theme/shadows';
 
-const CategoryList = () => {
+const CategoryList = ({ onSelect }) => {
+  const [selected, setSelected] = useState(null);
 
-  const renderCategory = ({ item }) => (
-    <TouchableOpacity style={styles.categoryCard}>
-      <Ionicons
-  name={item.icon}
-  size={28}
-  color={COLORS.primary}
-/>
-      <Text style={styles.categoryName}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
+  const handleSelect = (id) => {
+    const next = selected === id ? null : id;
+    setSelected(next);
+    onSelect && onSelect(next);
+  };
+
+  const renderCategory = ({ item }) => {
+    const isActive = selected === item.id;
+    return (
+      <TouchableOpacity
+        style={[styles.card, isActive && styles.cardActive]}
+        onPress={() => handleSelect(item.id)}
+        activeOpacity={0.75}
+      >
+        <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
+          <Ionicons name={item.icon} size={24} color={isActive ? '#fff' : COLORS.primary} />
+        </View>
+        <Text style={[styles.name, isActive && styles.nameActive]}>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <View>
-
-      <Text style={styles.title}>
-        Categories
-      </Text>
-
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Categories</Text>
+        <TouchableOpacity>
+          <Text style={styles.seeAll}>See All</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={categories}
         renderItem={renderCategory}
@@ -46,45 +45,67 @@ const CategoryList = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.list}
       />
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-
+  container: {},
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 24,
+    marginBottom: 14,
+  },
   title: {
-    fontSize: TYPOGRAPHY.h3,
-    fontWeight: TYPOGRAPHY.titleWeight,
+    fontSize: 18,
+    fontWeight: '800',
     color: COLORS.text,
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.md,
+    letterSpacing: -0.2,
   },
-
+  seeAll: {
+    fontSize: 13,
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
   list: {
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.md,
+    paddingHorizontal: 20,
+    paddingBottom: 6,
+    gap: 12,
   },
-
-  categoryCard: {
-    width: 90,
-    height: 90,
-    backgroundColor: COLORS.white,
-    borderRadius: 15,
+  card: {
+    alignItems: 'center',
+    width: 80,
+  },
+  cardActive: {},
+  iconWrap: {
+    width: 58,
+    height: 58,
+    borderRadius: 18,
+    backgroundColor: COLORS.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SPACING.md,
-    ...SHADOWS.card,
+    marginBottom: 7,
   },
-
-  categoryName: {
-    marginTop: 8,
-    fontSize: 14,
+  iconWrapActive: {
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  name: {
+    fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
   },
-
+  nameActive: {
+    color: COLORS.primary,
+  },
 });
 
 export default CategoryList;
